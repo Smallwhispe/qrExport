@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 import qrcode
 from vo.QrExport import QrExportReq, QrExportRes
 from vo.ResultEntity import ResultEntity, ResultEntityMethod
@@ -12,18 +13,38 @@ class DataViewService:
     @staticmethod
     def qr_export(request: QrExportReq) -> ResultEntity:
         try:
-            # 1) 从 Oracle 取最新一条记录
-            from services.qr.OracleRepository import fetch_latest_qr_record
+            # 1) 从数据库取最新一条记录
+            # --- 切换数据源：取消注释即可换回 Oracle ---
+            # from services.qr.OracleRepository import fetch_latest_qr_record
+            # record = fetch_latest_qr_record(
+            #     user=Config.ORACLE_USER,
+            #     password=Config.ORACLE_PASSWORD,
+            #     dsn=Config.ORACLE_DSN,
+            #     sql=Config.ORACLE_DEFAULT_SQL,
+            #     config_dir=Config.ORACLE_CONFIG_DIR,
+            #     wallet_password=Config.ORACLE_WALLET_PASSWORD,
+            # )
+            # if not record:
+            #     return ResultEntityMethod.buildFailedResult(message="Oracle 未查询到可用数据")
+            # --- 当前使用 MySQL ---
+            from services.qr.MySQLRepository import fetch_latest_qr_record
             record = fetch_latest_qr_record(
-                user=Config.ORACLE_USER,
-                password=Config.ORACLE_PASSWORD,
-                dsn=Config.ORACLE_DSN,
-                sql=Config.ORACLE_DEFAULT_SQL,
-                config_dir=Config.ORACLE_CONFIG_DIR,
-                wallet_password=Config.ORACLE_WALLET_PASSWORD,
+                # user=Config.ORACLE_USER,
+                # password=Config.ORACLE_PASSWORD,
+                # dsn=Config.ORACLE_DSN,
+                # sql=Config.ORACLE_DEFAULT_SQL,
+                # config_dir=Config.ORACLE_CONFIG_DIR,
+                # wallet_password=Config.ORACLE_WALLET_PASSWORD,
+                host=Config.MYSQL_HOST,
+                port=Config.MYSQL_PORT,
+                user=Config.MYSQL_USER,
+                password=Config.MYSQL_PASSWORD,
+                database=Config.MYSQL_DATABASE,
+                sql=Config.MYSQL_DEFAULT_SQL,
             )
             if not record:
-                return ResultEntityMethod.buildFailedResult(message="Oracle 未查询到可用数据")
+                # return ResultEntityMethod.buildFailedResult(message="Oracle 未查询到可用数据")
+                return ResultEntityMethod.buildFailedResult(message="MySQL 未查询到可用数据")
 
             # 2) 把记录格式化为字符串后编二维码，保存到 export/
             lines = []
@@ -36,11 +57,28 @@ class DataViewService:
                 lines.append(f"{key}={val}")
             data = "\n".join(lines)
 
+            # 追加导出时间戳，确保每次二维码内容不同
+            ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            data += f"\nqr_ts={ts}"
+
+            size = request.get("size")
+            if size is None:
+                size = Config.QR_SIZE
+            border = request.get("border")
+            if border is None:
+                border = Config.QR_BORDER
+            fill_color = request.get("fill_color")
+            if fill_color is None:
+                fill_color = Config.QR_FILL_COLOR
+            back_color = request.get("back_color")
+            if back_color is None:
+                back_color = Config.QR_BACK_COLOR
+
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_M,
-                box_size=request.get("size"),
-                border=request.get("border"),
+                box_size=size,
+                border=border,
             )
             qr.add_data(data)
             qr.make(fit=True)
@@ -48,22 +86,10 @@ class DataViewService:
             export_dir = EXPORT_DIR
             os.makedirs(export_dir, exist_ok=True)
 
-            def get_unique_filename(export_dir, filename):
-                name, ext = os.path.splitext(filename)
-                ext = ext or ".png"
-                counter = 1
-                new_filename = filename
-                filepath = os.path.join(export_dir, new_filename)
-                while os.path.exists(filepath):
-                    new_filename = f"{name}_{counter}{ext}"
-                    filepath = os.path.join(export_dir, new_filename)
-                    counter += 1
-                return new_filename, filepath
+            filename = request.get("filename") or f"qr_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            filepath = os.path.join(export_dir, filename)
 
-            filename = request.get("filename") or "qr.png"
-            unique_filename, filepath = get_unique_filename(export_dir, filename)
-
-            img = qr.make_image(fill_color=request.get("fill_color"), back_color=request.get("back_color"))
+            img = qr.make_image(fill_color=fill_color, back_color=back_color)
             img.save(filepath)
             logger.info("[qr 导出] - 二维码保存成功: %s", filepath)
 

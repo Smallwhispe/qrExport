@@ -5,6 +5,9 @@
 log/
 *.log
 
+# 导出目录
+export/
+
 # Python 运行时
 __pycache__/
 *.pyc

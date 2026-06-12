@@ -117,6 +117,9 @@ def popup_image(filepath: str, viewer_command: Optional[str] = None) -> None:
         _kill_previous_popup()
 
         viewer = (viewer_command or "").strip()
+        if not viewer or viewer.lower() in ("start", "default"):
+            viewer, _ = _pick_default_viewer()
+
         cmd, use_shell = _build_cmd(viewer, filepath)
 
         logger.info("[qr popup] - 打开二维码图片: %s (viewer=%s)", filepath, " ".join(cmd))

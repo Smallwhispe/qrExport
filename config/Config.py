@@ -18,6 +18,11 @@ class Config:
     QR_INTERVAL_SECONDS = int(os.getenv('QR_INTERVAL_SECONDS', '864000'))
     # 自定义图片查看器命令（空则自动选择）
     QR_IMAGE_VIEWER = os.getenv('QR_IMAGE_VIEWER', '') or None
+    # QR 图片生成参数
+    QR_SIZE = int(os.getenv('QR_SIZE', '20'))
+    QR_BORDER = int(os.getenv('QR_BORDER', '4'))
+    QR_FILL_COLOR = os.getenv('QR_FILL_COLOR', 'black')
+    QR_BACK_COLOR = os.getenv('QR_BACK_COLOR', 'white')
 
     # Oracle 数据库配置
     ORACLE_USER = os.getenv('ORACLE_USER', '')
@@ -28,4 +33,15 @@ class Config:
     ORACLE_DEFAULT_SQL = os.getenv(
         'ORACLE_DEFAULT_SQL',
         "SELECT * FROM (SELECT * FROM your_table ORDER BY sampled_date DESC) WHERE ROWNUM = 1"
+    )
+
+    # MySQL 数据库配置
+    MYSQL_HOST = os.getenv('MYSQL_HOST', '127.0.0.1')
+    MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
+    MYSQL_USER = os.getenv('MYSQL_USER', 'root')
+    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
+    MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', '')
+    MYSQL_DEFAULT_SQL = os.getenv(
+        'MYSQL_DEFAULT_SQL',
+        "SELECT * FROM your_table LIMIT 1"
     )
