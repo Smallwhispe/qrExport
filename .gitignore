@@ -1,0 +1,22 @@
+# 环境变量
+.env
+
+# 日志目录
+log/
+*.log
+
+# Python 运行时
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# PyInstaller 打包产物
+build/
+dist/
+*.spec
+
+# IDE
+.idea/
+.vscode/
