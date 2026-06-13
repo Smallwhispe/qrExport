@@ -224,7 +224,6 @@ scripts\uninstall_service.bat
 | `CORS_SUPPORT_CREDENTIALS` | 是否允许携带 Cookie/Authorization 等凭证 | `true` |
 | `CORS_MAX_AGE` | 预检请求缓存秒数 | `86400` |
 | `CORS_EXPOSE_HEADERS` | 暴露给前端的响应头（逗号分隔） | `Content-Type,Authorization` |
-| `QR_START_TRUE` | 是否开启 QR 自动导出 | `false` |
 | `QR_INTERVAL_SECONDS` | QR 导出周期（秒） | `864000`（10 天） |
 | `QR_IMAGE_VIEWER` | 自定义图片查看器命令（空=自动选择） | 空 |
 | `ORACLE_USER` / `ORACLE_PASSWORD` | Oracle 账号密码 | 空 |

@@ -12,8 +12,6 @@ if os.path.exists(_env_path):
 
 class Config:
     """QR 项目配置"""
-    # QR 调度开关
-    QR_START_TRUE = str(os.getenv('QR_START_TRUE', 'false')).strip().lower() == 'true'
     # QR 导出周期（秒）
     QR_INTERVAL_SECONDS = int(os.getenv('QR_INTERVAL_SECONDS', '864000'))
     # 自定义图片查看器命令（空则自动选择）

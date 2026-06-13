@@ -1,4 +1,4 @@
-"""Oracle 数据源仓库：从 Oracle 数据库按四种类型各取最新十条，合并为十条组合结果。依赖：python-oracledb。"""
+"""Oracle 数据源仓库：从 Oracle 数据库按四种类型各取最新一条，合并为一条组合结果。依赖：python-oracledb。"""
 import logging
 from typing import Optional, List, Dict, Any
 
@@ -36,9 +36,9 @@ def fetch_qr_records(user: str, password: str, dsn: str,
                      table: str = "data_view",
                      config_dir: Optional[str] = None,
                      wallet_password: Optional[str] = None) -> List[Dict[str, Any]]:
-    """按四种类型各查询最新 10 条记录，按位置合并为 10 条组合结果。
+    """按四种类型各查询最新 1 条记录，合并为 1 条组合结果。
 
-    返回: [{"bx_entry": ..., "bx_time": ..., "pr_entry": ..., ...}, ...]  共最多 10 条
+    返回: [{"bx_entry": ..., "bx_time": ..., "pr_entry": ..., ...}, ...]  共 1 条
     """
     try:
         import oracledb
@@ -58,7 +58,7 @@ def fetch_qr_records(user: str, password: str, dsn: str,
                 f"SELECT {_SELECT_COLUMNS} FROM {table} "
                 f"WHERE PROCESS_UNIT=:pu AND PRODUCT=:pd AND NAME=:nm "
                 f"ORDER BY SEARCHTIME DESC"
-                f") WHERE ROWNUM <= 10"
+                f") WHERE ROWNUM <= 1"
             )
             with conn.cursor() as cursor:
                 cursor.execute(sql, pu=process_unit, pd=product, nm=name)

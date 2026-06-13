@@ -39,17 +39,16 @@ class DataViewService:
             if not records:
                 return ResultEntityMethod.buildFailedResult(message="MySQL 未查询到可用数据")
 
-            # 2) 将组合结果格式化为紧凑字符串
+            # 2) 将唯一的组合结果格式化为紧凑字符串
+            rec = records[0]
             lines = []
-            for i, rec in enumerate(records, 1):
-                lines.append(f"---{i}---")
-                for key in sorted(rec.keys()):
-                    val = rec[key]
-                    if val is None:
-                        continue
-                    if hasattr(val, "isoformat"):
-                        val = val.isoformat(timespec="seconds") if hasattr(val, "timespec") else val.isoformat()
-                    lines.append(f"{key}={val}")
+            for key in sorted(rec.keys()):
+                val = rec[key]
+                if val is None:
+                    continue
+                if hasattr(val, "isoformat"):
+                    val = val.isoformat(timespec="seconds") if hasattr(val, "timespec") else val.isoformat()
+                lines.append(f"{key}={val}")
             data = "\n".join(lines)
 
             # 追加导出时间戳

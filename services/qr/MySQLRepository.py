@@ -1,4 +1,4 @@
-"""MySQL 数据源仓库：从 MySQL 数据库按四种类型各取最新十条，合并为十条组合结果。依赖：pymysql。"""
+"""MySQL 数据源仓库：从 MySQL 数据库按四种类型各取最新一条，合并为一条组合结果。依赖：pymysql。"""
 import logging
 from typing import List, Dict, Any
 
@@ -24,10 +24,10 @@ _SELECT_COLUMNS = "FORMATTED_ENTRY, SEARCHTIME"
 
 def fetch_qr_records(host: str, port: int, user: str, password: str,
                      database: str, table: str = "data_view") -> List[Dict[str, Any]]:
-    """按四种类型各查询最新 10 条记录，按位置合并为 10 条组合结果。
+    """按四种类型各查询最新 1 条记录，合并为 1 条组合结果。
 
     返回: [{"bingxi_name": ..., "bingxi_formatted_entry": ..., "bingxi_searchtime": ...,
-            "pressure_name": ..., ...}, ...]  共 10 条
+            "pressure_name": ..., ...}, ...]  共 1 条
     """
     try:
         import pymysql
@@ -47,7 +47,7 @@ def fetch_qr_records(host: str, port: int, user: str, password: str,
             sql = (
                 f"SELECT {_SELECT_COLUMNS} FROM {table} "
                 "WHERE PROCESS_UNIT=%s AND PRODUCT=%s AND NAME=%s "
-                "ORDER BY SEARCHTIME DESC LIMIT 10"
+                "ORDER BY SEARCHTIME DESC LIMIT 1"
             )
             with conn.cursor() as cursor:
                 cursor.execute(sql, (process_unit, product, name))

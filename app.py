@@ -98,7 +98,6 @@ def create_app():
     def index():
         return jsonify({
             "service": "QR Export Service",
-            "QR_START_TRUE": Config.QR_START_TRUE,
             "QR_INTERVAL_SECONDS": Config.QR_INTERVAL_SECONDS,
             "endpoints": [
                 "GET  /qrExport   - 手动触发一次二维码导出",
